@@ -1,0 +1,44 @@
+name: Generate RSS Feed
+
+on:
+  push:
+    paths:
+      - 'briefs.md'
+  workflow_dispatch:
+
+jobs:
+  build-rss:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Generate XML
+        run: |
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > jokebriefs.xml
+          echo '<rss version="2.0"><channel>' >> jokebriefs.xml
+          echo '<title>News in Brief – Joke Feed</title>' >> jokebriefs.xml
+          echo '<link>https://hansfosho.github.io/jokebriefs/jokebriefs.xml</link>' >> jokebriefs.xml
+          echo '<description>Brief real news stories curated for joke writing.</description>' >> jokebriefs.xml
+          echo '<language>en-us</language>' >> jokebriefs.xml
+          echo '<pubDate>'$(date -Ru)'</pubDate>' >> jokebriefs.xml
+
+          while IFS="|" read -r title link
+          do
+            title=$(echo "$title" | xargs)
+            link=$(echo "$link" | xargs)
+            echo '<item>' >> jokebriefs.xml
+            echo "<title>${title}</title>" >> jokebriefs.xml
+            echo "<link>${link}</link>" >> jokebriefs.xml
+            echo "<description>${title}</description>" >> jokebriefs.xml
+            echo '<pubDate>'$(date -Ru)'</pubDate>' >> jokebriefs.xml
+            echo '</item>' >> jokebriefs.xml
+          done < briefs.md
+
+          echo '</channel></rss>' >> jokebriefs.xml
+
+      - name: Push RSS Feed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-generate jokebriefs.xml"
+          branch: main
