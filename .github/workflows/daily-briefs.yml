@@ -1,0 +1,45 @@
+name: Daily Joke Briefs RSS
+
+on:
+  schedule:
+    - cron: '0 13 * * *'  # Runs every day at 5 AM Pacific / 8 AM Eastern
+  workflow_dispatch:
+
+jobs:
+  generate-feed:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Generate RSS XML
+        run: |
+          mkdir -p tmp
+          curl -s https://www.reddit.com/r/nottheonion/top.json?limit=20 | jq -r '.data.children[].data | "\(.title) | https://reddit.com\(.permalink)"' | head -n 5 > tmp/briefs.txt
+
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > dailybriefs.xml
+          echo '<rss version="2.0"><channel>' >> dailybriefs.xml
+          echo '<title>News in Brief – Joke Feed</title>' >> dailybriefs.xml
+          echo '<link>https://hansfosho.github.io/jokebriefs/dailybriefs.xml</link>' >> dailybriefs.xml
+          echo '<description>Daily curated news briefs for joke writing.</description>' >> dailybriefs.xml
+          echo '<language>en-us</language>' >> dailybriefs.xml
+          echo '<pubDate>'$(date -Ru)'</pubDate>' >> dailybriefs.xml
+
+          while IFS="|" read -r title link
+          do
+            echo '<item>' >> dailybriefs.xml
+            echo "<title>${title}</title>" >> dailybriefs.xml
+            echo "<link>${link}</link>" >> dailybriefs.xml
+            echo "<description>${title}</description>" >> dailybriefs.xml
+            echo '<pubDate>'$(date -Ru)'</pubDate>' >> dailybriefs.xml
+            echo '</item>' >> dailybriefs.xml
+          done < tmp/briefs.txt
+
+          echo '</channel></rss>' >> dailybriefs.xml
+
+      - name: Commit Updated XML
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 Daily update: Joke briefs auto-generated"
+          branch: main
