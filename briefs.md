@@ -1,3 +1,4 @@
 - Orlando, FL — Deputies rescue emu near pond | https://people.com/florida-officials-rescue-emu-who-escaped-11777577
 - Fargo, ND — Ground squirrels overrun public spaces | https://apnews.com/article/american-samoa-voting-citizenship-alaska-trump-eda6c32ce0fcdca6edb22efac26e403d
 - Australia — Snake found aboard commercial flight | https://apnews.com/article/american-samoa-voting-citizenship-alaska-trump-eda6c32ce0fcdca6edb22efac26e403d
+- Lexington, KY — Police recover stolen bridge used for scrap | https://www.nbcnews.com/news/us-news/kentucky-police-recover-stolen-bridge-used-sell-scrap-rcna155488
